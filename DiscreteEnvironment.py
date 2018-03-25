@@ -72,7 +72,7 @@ class DiscreteEnvironment(object):
         config = [0.0] * self.dimension
 
         config = [(x+0.5)*self.resolution for x in coord]
-        config = np.array(config)
+        config = np.array(config) - np.abs(self.lower_limits)
 
         return config
 

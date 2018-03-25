@@ -7,7 +7,8 @@ class HerbEnvironment(object):
         
         self.robot = herb.robot
         self.lower_limits, self.upper_limits = self.robot.GetActiveDOFLimits()
-        self.discrete_env = DiscreteEnvironment(resolution, self.lower_limits, self.upper_limits)
+        self.resolution = resolution
+        self.discrete_env = DiscreteEnvironment(self.resolution, self.lower_limits, self.upper_limits)
 
         # account for the fact that snapping to the middle of the grid cell may put us over our
         #  upper limit
@@ -34,15 +35,52 @@ class HerbEnvironment(object):
                                    [ 0.        ,  0.        ,  0.        ,  1.        ]])
         self.robot.GetEnv().GetViewer().SetCamera(camera_pose)
     
+    def checkSucc(self, config):
+
+        self.env = self.robot.GetEnv()
+        robot_pose = self.robot.GetTransform()
+        table = self.robot.GetEnv().GetBodies()[1]
+
+        config = config.tolist()
+        self.robot.SetActiveDOFValues(config)
+
+        if self.env.CheckCollision(self.robot,table):
+            return False
+
+        for i in range(self.discrete_env.dimension):
+            if not(self.lower_limits[i] <= config[i] <= self.upper_limits[i]):
+                return False
+
+        return True
+
     def GetSuccessors(self, node_id):
 
         successors = []
+        successors_config = []
 
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
         #  nodes
         
+        config = self.discrete_env.NodeIdToConfiguration(node_id)
+
+        for i in range(2 * self.discrete_env.dimension):
+            prim = np.zeros(self.discrete_env.dimension)
+            prim[i/2] = self.resolution
+
+            if np.mod(i,2):
+                succ = np.asarray(config) + prim
+            else:
+                succ = np.asarray(config) - prim
+                
+            if self.checkSucc(succ):
+                successors_config.append(succ)
+            else:
+                continue
+
+        successors = [self.discrete_env.ConfigurationToNodeId(x) for x in successors_config]
+
         return successors
 
     def ComputeDistance(self, start_id, end_id):
@@ -52,7 +90,12 @@ class HerbEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
         # by the two node ids
-       
+
+        start_config = self.discrete_env.NodeIdToConfiguration(start_id)
+        end_config = self.discrete_env.NodeIdToConfiguration(end_id)
+
+        dist = np.linalg.norm(end_config - start_config)
+
         return dist
 
     def ComputeHeuristicCost(self, start_id, goal_id):
@@ -62,6 +105,12 @@ class HerbEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-        
+
+        # Keeping it as Euclidean distance for now
+
+        start_config = self.discrete_env.NodeIdToConfiguration(start_id)
+        end_config = self.discrete_env.NodeIdToConfiguration(goal_id)
+        cost = np.linalg.norm(end_config - start_config)
+
         return cost
 

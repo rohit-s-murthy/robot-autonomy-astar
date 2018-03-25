@@ -17,7 +17,7 @@ class BreadthFirstPlanner(object):
         
         parent = dict()
         to_visit = deque()
-
+        print(start_config)
         s_id = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
         g_id = self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
         parent[s_id] = None
