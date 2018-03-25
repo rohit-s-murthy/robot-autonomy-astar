@@ -27,7 +27,7 @@ class DiscreteEnvironment(object):
         # space to a node in discrete space
         #
 
-        print('config: {}'.format(config))
+        # print('config: {}'.format(config))
         coord = self.ConfigurationToGridCoord(config)
 
         node_id = self.GridCoordToNodeId(coord)
@@ -54,7 +54,7 @@ class DiscreteEnvironment(object):
         # This function maps a configuration in the full configuration space
         # to a grid coordinate in discrete space
         #
-        config = np.array(config) + np.abs(self.lower_limits)
+        config = np.array(config) - self.lower_limits
         coord = [0.0] * self.dimension
 
         coord = [x/self.resolution for x in config]
@@ -72,7 +72,7 @@ class DiscreteEnvironment(object):
         config = [0.0] * self.dimension
 
         config = [(x+0.5)*self.resolution for x in coord]
-        config = np.array(config) - np.abs(self.lower_limits)
+        config = np.array(config) + self.lower_limits
 
         return config
 
@@ -81,7 +81,7 @@ class DiscreteEnvironment(object):
         # TODO:
         # This function maps a grid coordinate to the associated
         # node id 
-        print('coord: {}'.format(coord))
+        # print('coord: {}'.format(coord))
         node_id = np.ravel_multi_index(coord, dims=self.num_cells, order='F')
         
         # for idx in range(self.dimension-1):

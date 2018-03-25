@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 from DiscreteEnvironment import DiscreteEnvironment
 
 class HerbEnvironment(object):
@@ -22,14 +22,14 @@ class HerbEnvironment(object):
         
         self.robot.GetEnv().Add(table)
 
-        table_pose = numpy.array([[ 0, 0, -1, 0.7], 
+        table_pose = np.array([[ 0, 0, -1, 0.7],
                                   [-1, 0,  0, 0], 
                                   [ 0, 1,  0, 0], 
                                   [ 0, 0,  0, 1]])
         table.SetTransform(table_pose)
         
         # set the camera
-        camera_pose = numpy.array([[ 0.3259757 ,  0.31990565, -0.88960678,  2.84039211],
+        camera_pose = np.array([[ 0.3259757 ,  0.31990565, -0.88960678,  2.84039211],
                                    [ 0.94516159, -0.0901412 ,  0.31391738, -0.87847549],
                                    [ 0.02023372, -0.9431516 , -0.33174637,  1.61502194],
                                    [ 0.        ,  0.        ,  0.        ,  1.        ]])
