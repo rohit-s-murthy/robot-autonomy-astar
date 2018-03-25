@@ -21,20 +21,24 @@ class BreadthFirstPlanner(object):
         s_id = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
         g_id = self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
         parent[s_id] = None
-        succ = self.planning_env.GetSuccessors(s_id)
+        to_visit.append(s_id)
         
-
+        print "starting planning"
+        print g_id
         while to_visit:
             s_id = to_visit.popleft()
+            print "visiting", s_id
             succ = self.planning_env.GetSuccessors(s_id)
+            print "successors", succ
             for s in succ:
                 if s not in parent:
                     to_visit.append(s)
                     parent[s] = s_id
+                    print s_id, s
             if g_id in parent:
                 break
 
-        plan_ids = [goal_id]
+        plan_ids = [g_id]
         plan = [goal_config]
         while parent[plan_ids[-1]] is not None:
             config_to_add = self.planning_env.NodeIdToConfiguration(parent[plan_ids[-1]])
