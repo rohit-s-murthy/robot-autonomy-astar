@@ -10,19 +10,17 @@ class DepthFirstPlanner(object):
         self.parent = dict() #easier to relate
             
 
-    def DFSUtil(self,current_nodeId,goal_nodeId,visited):
-        visited[current_nodeId] = True
+    def DFS(self,current_nodeId,goal_nodeId):
         succ = self.planning_env.GetSuccessors(current_nodeId)
-        # print("current node = %s\n" %(current_nodeId))
         for idx in succ:
             #exit from function if we reach goal
             if idx == goal_nodeId:
                 self.parent[goal_nodeId]=current_nodeId
                 break
             #else perform recursion over successors
-            elif visited[idx]==False:
+            elif idx not in self.parent:
                 self.parent[idx]=current_nodeId
-                self.DFSUtil(idx,goal_nodeId,visited)
+                self.DFS(idx,goal_nodeId)
 
 
     def Plan(self, start_config, goal_config):
@@ -37,11 +35,9 @@ class DepthFirstPlanner(object):
         start_nodeId = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
         goal_nodeId = self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
 
-        #array to check whether node was visited or not
-        visited = [False]*((self.planning_env.discrete_env.num_cells[0]*self.planning_env.discrete_env.num_cells[1]))
-
-        #helpfer function to perform recursion
-        self.DFSUtil(start_nodeId,goal_nodeId,visited)
+        #helper function to perform recursion
+        # print(start_nodeId)
+        self.DFS(start_nodeId,goal_nodeId)
 
         idx = goal_nodeId
         #generating plan reverse
@@ -58,5 +54,4 @@ class DepthFirstPlanner(object):
         plan.append(start_config)
         plan.reverse()
         print(plan)
-
         return plan
