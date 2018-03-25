@@ -1,3 +1,4 @@
+import numpy as np
 
 class BreadthFirstPlanner(object):
     
@@ -15,6 +16,12 @@ class BreadthFirstPlanner(object):
         #  and n is the dimension of the robots configuration space
         
         plan.append(start_config)
+        s_id = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
+
+        while True:
+
+            succ = self.planning_env.GetSuccessors(s_id)[0]
+
         plan.append(goal_config)
    
         return plan

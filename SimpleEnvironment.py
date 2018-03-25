@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
 
@@ -29,6 +29,12 @@ class SimpleEnvironment(object):
         #  and return a list of node_ids that represent the neighboring
         #  nodes
         
+        coord = self.discrete_env.NodeIdToGridCoord(node_id)
+
+        successors_coord = [coord[0] + 1, coord[0] - 1, coord[1] + 1, coord[1] - 1]
+
+        successors = [self.discrete_env.GridCoordToNodeId(x) for x in successors_coord]
+
         return successors
 
     def ComputeDistance(self, start_id, end_id):
@@ -39,6 +45,11 @@ class SimpleEnvironment(object):
         # computes the distance between the configurations given
         # by the two node ids
 
+        start_config = self.discrete_env.NodeIdToConfiguration(start_id)
+        end_config = self.discrete_env.NodeIdToConfiguration(end_id)
+
+        dist = np.linalg.norm(end_config - start_config)
+
         return dist
 
     def ComputeHeuristicCost(self, start_id, goal_id):
@@ -48,6 +59,12 @@ class SimpleEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
+
+        # Keeping it as Euclidean distance for now
+
+        start_config = self.discrete_env.NodeIdToConfiguration(start_id)
+        end_config = self.discrete_env.NodeIdToConfiguration(end_id)
+        cost = np.linalg.norm(goal_config - start_config)
 
         return cost
 

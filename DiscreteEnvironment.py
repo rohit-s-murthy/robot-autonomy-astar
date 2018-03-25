@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 class DiscreteEnvironment(object):
 
@@ -26,7 +26,10 @@ class DiscreteEnvironment(object):
         # This function maps a node configuration in full configuration
         # space to a node in discrete space
         #
-        node_id = 0
+        coord = self.ConfigurationToGridCoord(config)
+
+        node_id = self.GridCoordToNodeId(coord)
+
         return node_id
 
     def NodeIdToConfiguration(self, nid):
@@ -36,6 +39,11 @@ class DiscreteEnvironment(object):
         # in the full configuration space
         #
         config = [0] * self.dimension
+
+        coord = self.NodeIdToGridCoord(nid)
+
+        config = self.GridCoordToConfiguration(coord)
+        
         return config
         
     def ConfigurationToGridCoord(self, config):
@@ -45,6 +53,11 @@ class DiscreteEnvironment(object):
         # to a grid coordinate in discrete space
         #
         coord = [0] * self.dimension
+
+        coord = [x/self.resolution for x in config]
+        coord = np.floor(config)
+        coord = [int(x) for x in coord]
+
         return coord
 
     def GridCoordToConfiguration(self, coord):
@@ -54,6 +67,9 @@ class DiscreteEnvironment(object):
         # to a configuration in the full configuration space
         #
         config = [0] * self.dimension
+
+        config = [(x+0.5)*self.resolution for x in coord]
+
         return config
 
     def GridCoordToNodeId(self,coord):
@@ -61,7 +77,15 @@ class DiscreteEnvironment(object):
         # TODO:
         # This function maps a grid coordinate to the associated
         # node id 
-        node_id = 0
+
+        node_id = np.ravel_multi_index(coord, dims=self.num_cells, order='F')
+        
+        # for idx in range(self.dimension-1):
+        #     node_id *= self.num_cells[idx]
+
+        # node_id += coord[self.dimension]
+        # np.dot((1, 0, 1), a.strides) / a.itemsize
+
         return node_id
 
     def NodeIdToGridCoord(self, node_id):
@@ -70,6 +94,9 @@ class DiscreteEnvironment(object):
         # This function maps a node id to the associated
         # grid coordinate
         coord = [0] * self.dimension
+        
+        coord = np.unravel_index(node_id, self.num_cells, order='F')
+
         return coord
         
         
