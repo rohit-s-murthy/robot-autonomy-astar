@@ -36,6 +36,7 @@ class BreadthFirstPlanner(object):
 
         plan = [goal_config]
         while parent[plan[-1]] is not None:
-            plan.append(parent[plan[-1]])
-   
+            config_to_add = self.planning_env.NodeIdToConfiguration(parent[plan[-1]])
+            plan.append(config_to_add)
+        plan.reverse()   
         return plan
