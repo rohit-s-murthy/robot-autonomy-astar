@@ -34,9 +34,11 @@ class BreadthFirstPlanner(object):
             if g_id in parent:
                 break
 
+        plan_ids = [goal_id]
         plan = [goal_config]
-        while parent[plan[-1]] is not None:
-            config_to_add = self.planning_env.NodeIdToConfiguration(parent[plan[-1]])
+        while parent[plan_ids[-1]] is not None:
+            config_to_add = self.planning_env.NodeIdToConfiguration(parent[plan_ids[-1]])
             plan.append(config_to_add)
+            plan_ids.append(parent[plan_ids[-1]])
         plan.reverse()   
         return plan
