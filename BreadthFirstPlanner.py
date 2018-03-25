@@ -1,4 +1,5 @@
 import numpy as np
+from collections import deque
 
 class BreadthFirstPlanner(object):
     
@@ -8,20 +9,32 @@ class BreadthFirstPlanner(object):
         
     def Plan(self, start_config, goal_config):
         
-        plan = []
 
         # TODO: Here you will implement the breadth first planner
         #  The return path should be a numpy array
         #  of dimension k x n where k is the number of waypoints
         #  and n is the dimension of the robots configuration space
         
-        plan.append(start_config)
+        parent = dict()
+        to_visit = deque()
+
         s_id = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
+        g_id = self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
+        parent[s_id] = None
+        succ = self.planning_env.GetSuccessors(s_id)
+        
 
-        while True:
+        while to_visit:
+            s_id = to_visit.popleft()
+            succ = self.planning_env.GetSuccessors(s_id)
+            for s in succ:
+                to_visit.append(s)
+                parent[s] = s_id
+            if g_id in parent:
+                break
 
-            succ = self.planning_env.GetSuccessors(s_id)[0]
-
-        plan.append(goal_config)
+        plan = [goal_config]
+        while parent[plan[-1]] is not None:
+            plan.append(parent[plan[-1]])
    
         return plan
