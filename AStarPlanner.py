@@ -17,11 +17,7 @@ class AStarPlanner(object):
         #  and n is the dimension of the robots configuration space
         
         print "In AStarPlanner"
-        
-        g_state1 = GraphState()
-        g_state1.printInfo()
 
-        raw_input()
         #--------------------------------------------------------------------------------
 
         # AM TODO: Check for validity of start_config & goal_config
@@ -42,6 +38,7 @@ class AStarPlanner(object):
         robot_goal_state.id_ = goal_id
         robot_goal_state.pred_id_ = -1
 
+        print ("Running AStarPlanner for start state ID %d , goal state ID %d" % (start_id, goal_id) )
 
         graph_manager = GraphManager(robot_start_state, robot_goal_state, self.planning_env)
 
@@ -110,7 +107,7 @@ class GraphManager(object):
         self.start_state_ = start_state
         self.goal_state_ = goal_state
         self.is_goal_state_expanded_ = False
-        self.epsilon_ = 2.0
+        self.epsilon_ = 0.2
         self.prim_cost_ = 1.0
         self.open_queue_ = []
         self.closed_list_ = []
@@ -224,6 +221,8 @@ class GraphManager(object):
 
         if(pred_id != self.start_state_.id_):
             raise Exception('ERROR: Start State not reached from back tracking - getPathIDsToGoal')
+
+        print 
 
         return path_ids
 
