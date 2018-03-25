@@ -28,8 +28,9 @@ class BreadthFirstPlanner(object):
             s_id = to_visit.popleft()
             succ = self.planning_env.GetSuccessors(s_id)
             for s in succ:
-                to_visit.append(s)
-                parent[s] = s_id
+                if s not in parent:
+                    to_visit.append(s)
+                    parent[s] = s_id
             if g_id in parent:
                 break
 
