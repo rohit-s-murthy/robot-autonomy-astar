@@ -55,9 +55,9 @@ class SimpleEnvironment(object):
             prim[i/2] = self.resolution
 
             if np.mod(i,2):
-                succ = np.asarray(config) + prim;
+                succ = np.asarray(config) + prim
             else:
-                succ = np.asarray(config) - prim;
+                succ = np.asarray(config) - prim
                 
             if self.checkSucc(succ):
                 successors_config.append(succ)
