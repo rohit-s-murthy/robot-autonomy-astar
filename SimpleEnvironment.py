@@ -1,7 +1,7 @@
 import numpy as np
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
-
+import pdb
 
 class SimpleEnvironment(object):
     
@@ -25,15 +25,21 @@ class SimpleEnvironment(object):
     def checkSucc(self, config):
 
         self.env = self.robot.GetEnv()
+        robot_pose = self.robot.GetTransform()
         table = self.robot.GetEnv().GetBodies()[1]
+        # pdb.set_trace()
+        # config = config.tolist()
+        # self.robot.SetActiveDOFValues(config)
 
-        self.robot.SetActiveDOFValues(config)
+        robot_pose[0][3] = config[0];
+        robot_pose[1][3] = config[1];
+        self.robot.SetTransform(robot_pose);
 
         if self.env.CheckCollision(self.robot,table):
             return False
 
         for i in range(self.discrete_env.dimension):
-            if not(self.lower_limits <= config[i] <= self.upper_limits):
+            if not(self.lower_limits[i] <= config[i] <= self.upper_limits[i]):
                 return False
 
         return True
@@ -51,7 +57,7 @@ class SimpleEnvironment(object):
         config = self.discrete_env.NodeIdToConfiguration(node_id)
 
         for i in range(2 * self.discrete_env.dimension):
-            prim = np.zeros((self.discrete_env.dimension,1))
+            prim = np.zeros(self.discrete_env.dimension)
             prim[i/2] = self.resolution
 
             if np.mod(i,2):
