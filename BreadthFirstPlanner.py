@@ -41,4 +41,5 @@ class BreadthFirstPlanner(object):
             plan.append(config_to_add)
             plan_ids.append(parent[plan_ids[-1]])
         plan.reverse()   
+
         return plan
