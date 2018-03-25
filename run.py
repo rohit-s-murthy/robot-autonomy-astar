@@ -34,16 +34,22 @@ if __name__ == "__main__":
     
     parser.add_argument('-r', '--robot', type=str, default='simple',
                         help='The robot to load (herb or simple)')
-    parser.add_argument('-p', '--planner', type=str, default='astar',
+
+    parser.add_argument('-p', '--planner', type=str, default='bfs',
                         help='The planner to run (astar, bfs, dfs or hrrt)')
+
     parser.add_argument('-v', '--visualize', action='store_true',
                         help='Enable visualization of tree growth (only applicable for simple robot)')
+
     parser.add_argument('--resolution', type=float, default=0.1,
                         help='Set the resolution of the grid (default: 0.1)')
+
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Enable debug logging')
+
     parser.add_argument('-m', '--manip', type=str, default='right',
                         help='The manipulator to plan with (right or left) - only applicable if robot is of type herb')
+
     args = parser.parse_args()
     
     openravepy.RaveInitialize(True, level=openravepy.DebugLevel.Info)
@@ -52,38 +58,40 @@ if __name__ == "__main__":
     if args.debug:
         openravepy.RaveSetDebugLevel(openravepy.DebugLevel.Debug)
 
-    env = openravepy.Environment()
-    env.SetViewer('qtcoin')
-    env.GetViewer().SetName('Homework 2 Viewer')
+    try:
+        env = openravepy.Environment()
+        env.SetViewer('qtcoin')
+        env.GetViewer().SetName('Homework 2 Viewer')
 
-    # First setup the environment and the robot
-    visualize = args.visualize
-    if args.robot == 'herb':
-        robot = HerbRobot(env, args.manip)
-        planning_env = HerbEnvironment(robot, args.resolution)
-        visualize = False
-    elif args.robot == 'simple':
-        robot = SimpleRobot(env)
-        planning_env = SimpleEnvironment(robot, args.resolution)
-    else:
-        print 'Unknown robot option: %s' % args.robot
-        exit(0)
+        # First setup the environment and the robot
+        visualize = args.visualize
+        if args.robot == 'herb':
+            robot = HerbRobot(env, args.manip)
+            planning_env = HerbEnvironment(robot, args.resolution)
+            visualize = False
+        elif args.robot == 'simple':
+            robot = SimpleRobot(env)
+            planning_env = SimpleEnvironment(robot, args.resolution)
+        else:
+            print 'Unknown robot option: %s' % args.robot
+            exit(0)
 
-    # Next setup the planner
-    if args.planner == 'astar':
-        planner = AStarPlanner(planning_env, visualize)
-    elif args.planner == 'bfs':
-        planner = BreadthFirstPlanner(planning_env, visualize)
-    elif args.planner == 'dfs':
-        planner = DepthFirstPlanner(planning_env, visualize)
-    elif args.planner == 'hrrt':
-        planner = HeuristicRRTPlanner(planning_env, visualize)
-    else:
-        print 'Unknown planner option: %s' % args.planner
-        exit(0)
+        # Next setup the planner
+        if args.planner == 'astar':
+            planner = AStarPlanner(planning_env, visualize)
+        elif args.planner == 'bfs':
+            planner = BreadthFirstPlanner(planning_env, visualize)
+        elif args.planner == 'dfs':
+            planner = DepthFirstPlanner(planning_env, visualize)
+        elif args.planner == 'hrrt':
+            planner = HeuristicRRTPlanner(planning_env, visualize)
+        else:
+            print 'Unknown planner option: %s' % args.planner
+            exit(0)
 
-    main(robot, planning_env, planner)
-
+        main(robot, planning_env, planner)
+    finally:
+        env.Destroy()
     # import IPython
     # IPython.embed()
 

@@ -2,38 +2,69 @@ import numpy as np
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
 
+
 class SimpleEnvironment(object):
     
     def __init__(self, herb, resolution):
         self.robot = herb.robot
         self.lower_limits = [-5., -5.]
         self.upper_limits = [5., 5.]
-        self.discrete_env = DiscreteEnvironment(resolution, self.lower_limits, self.upper_limits)
+        self.resolution = resolution
+        self.discrete_env = DiscreteEnvironment(self.resolution, self.lower_limits, self.upper_limits)
 
         # add an obstacle
         table = self.robot.GetEnv().ReadKinBodyXMLFile('models/objects/table.kinbody.xml')
         self.robot.GetEnv().Add(table)
 
-        table_pose = numpy.array([[ 0, 0, -1, 1.5], 
+        table_pose = np.array([[ 0, 0, -1, 1.5],
                                   [-1, 0,  0, 0], 
                                   [ 0, 1,  0, 0], 
                                   [ 0, 0,  0, 1]])
         table.SetTransform(table_pose)
 
+    def checkSucc(self, config):
+
+        self.env = self.robot.GetEnv()
+        table = self.robot.GetEnv().GetBodies()[1]
+
+        self.robot.SetActiveDOFValues(config)
+
+        if self.env.CheckCollision(self.robot,table):
+            return False
+
+        for i in range(self.discrete_env.dimension):
+            if not(self.lower_limits <= config[i] <= self.upper_limits):
+                return False
+
+        return True
+
     def GetSuccessors(self, node_id):
 
         successors = []
+        successors_config = []
 
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
         #  nodes
         
-        coord = self.discrete_env.NodeIdToGridCoord(node_id)
+        config = self.discrete_env.NodeIdToConfiguration(node_id)
 
-        successors_coord = [coord[0] + 1, coord[0] - 1, coord[1] + 1, coord[1] - 1]
+        for i in range(2 * self.discrete_env.dimension):
+            prim = np.zeros((self.discrete_env.dimension,1))
+            prim[i/2] = self.resolution
 
-        successors = [self.discrete_env.GridCoordToNodeId(x) for x in successors_coord]
+            if np.mod(i,2):
+                succ = np.asarray(config) + prim;
+            else:
+                succ = np.asarray(config) - prim;
+                
+            if self.checkSucc(succ):
+                successors_config.append(succ)
+            else:
+                continue
+
+        successors = [self.discrete_env.ConfigurationToNodeId(x) for x in successors_config]
 
         return successors
 
@@ -63,8 +94,8 @@ class SimpleEnvironment(object):
         # Keeping it as Euclidean distance for now
 
         start_config = self.discrete_env.NodeIdToConfiguration(start_id)
-        end_config = self.discrete_env.NodeIdToConfiguration(end_id)
-        cost = np.linalg.norm(goal_config - start_config)
+        end_config = self.discrete_env.NodeIdToConfiguration(goal_id)
+        cost = np.linalg.norm(end_config - start_config)
 
         return cost
 

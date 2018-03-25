@@ -18,9 +18,8 @@ class BreadthFirstPlanner(object):
         plan.append(start_config)
         s_id = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
 
-        while True:
-
-            succ = self.planning_env.GetSuccessors(s_id)[0]
+        succ = self.planning_env.GetSuccessors(s_id)[0]
+        print('succ: {}'.format(succ))
 
         plan.append(goal_config)
    
