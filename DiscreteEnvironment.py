@@ -17,7 +17,7 @@ class DiscreteEnvironment(object):
         # Figure out the number of grid cells that are in each dimension
         self.num_cells = self.dimension*[0]
         for idx in range(self.dimension):
-            self.num_cells[idx] = numpy.ceil((upper_limits[idx] - lower_limits[idx])/resolution)
+            self.num_cells[idx] = np.ceil((upper_limits[idx] - lower_limits[idx])/resolution)
 
 
     def ConfigurationToNodeId(self, config):
@@ -52,10 +52,10 @@ class DiscreteEnvironment(object):
         # This function maps a configuration in the full configuration space
         # to a grid coordinate in discrete space
         #
-        coord = [0] * self.dimension
+        coord = [0.0] * self.dimension
 
         coord = [x/self.resolution for x in config]
-        coord = np.floor(config)
+        coord = np.floor(coord)
         coord = [int(x) for x in coord]
 
         return coord
@@ -66,9 +66,10 @@ class DiscreteEnvironment(object):
         # This function smaps a grid coordinate in discrete space
         # to a configuration in the full configuration space
         #
-        config = [0] * self.dimension
+        config = [0.0] * self.dimension
 
         config = [(x+0.5)*self.resolution for x in coord]
+        config = np.array(config)
 
         return config
 
@@ -100,4 +101,20 @@ class DiscreteEnvironment(object):
         return coord
         
         
-        
+def main():
+    resolution = np.array([0.1])
+    lower_limits = np.array([0.0, 0.0])
+    upper_limits = np.array([1.0, 1.0])
+    env = DiscreteEnvironment(resolution, lower_limits, upper_limits)
+
+    pos = np.array([0.73, 0.35])
+    grid = env.ConfigurationToGridCoord(pos)
+    node = env.GridCoordToNodeId(grid)
+    node = env.ConfigurationToNodeId(pos)
+    grid = env.NodeIdToGridCoord(node)
+    pos = env.NodeIdToConfiguration(node)
+    pos = env.GridCoordToConfiguration(grid)
+
+
+if __name__ == "__main__":
+    main()
