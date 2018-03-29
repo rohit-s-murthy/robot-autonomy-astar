@@ -55,10 +55,16 @@ class AStarPlanner(object):
             raise Exception('FAILURE: Path Not Found!')
 
         path_ids.reverse()
+        self.planning_env.InitializePlot(goal_config)
+        prev_config = start_config
 
         for i,state_id in enumerate(path_ids):
             state_config = self.planning_env.discrete_env.NodeIdToConfiguration(state_id)
             plan.append(state_config)
+            if state_config[0]!=start_config[0] and state_config[1]!=start_config[1]:
+                self.planning_env.PlotEdge(prev_config, state_config)
+                prev_config = state_config
+
 
 
         # plan.append(start_config)
@@ -107,8 +113,8 @@ class GraphManager(object):
         self.start_state_ = start_state
         self.goal_state_ = goal_state
         self.is_goal_state_expanded_ = False
-        self.epsilon_ = 0.2
-        self.prim_cost_ = 1.0
+        self.epsilon_ = 0.001
+        self.prim_cost_ = 0.1
         self.open_queue_ = []
         self.closed_list_ = []
         self.planning_env_ = planning_env

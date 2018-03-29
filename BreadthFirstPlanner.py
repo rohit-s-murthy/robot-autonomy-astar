@@ -22,6 +22,9 @@ class BreadthFirstPlanner(object):
         g_id = self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
         parent[s_id] = None
         to_visit.append(s_id)
+
+        self.planning_env.InitializePlot(goal_config)
+        prev_config = goal_config
         
         # print "starting planning"
         # print g_id
@@ -43,6 +46,8 @@ class BreadthFirstPlanner(object):
         while parent[plan_ids[-1]] is not None:
             config_to_add = self.planning_env.discrete_env.NodeIdToConfiguration(parent[plan_ids[-1]])
             plan.append(config_to_add)
+            self.planning_env.PlotEdge(config_to_add,prev_config)
+            prev_config = config_to_add
             plan_ids.append(parent[plan_ids[-1]])
         plan.reverse()   
 
